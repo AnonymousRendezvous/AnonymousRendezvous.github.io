@@ -1,0 +1,9 @@
+html,body{
+    text-align: center;
+}
+.inline h4{
+    font-size: 0.85rem;
+}
+h3{
+    margin: 0 0 10px 0;
+}
