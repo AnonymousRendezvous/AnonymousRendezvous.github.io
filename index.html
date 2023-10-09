@@ -2,84 +2,174 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="mobile.css" media="(max-width:630px)" />
-    <title>La Plume De Cristal</title>
+    <title>Pixel Art App</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      #container {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+      }
+
+      #grid {
+        display: grid;
+        gap: 1px;
+        margin-top: 20px;
+      }
+
+      .pixel {
+        width: 20px;
+        height: 20px;
+        background-color: white;
+        border: 1px solid #ccc;
+      }
+
+      #controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+      }
+
+      #colorPicker {
+        margin-bottom: 10px;
+      }
+
+      #clearButton {
+        padding: 10px 20px;
+        font-size: 16px;
+      }
+    </style>
   </head>
   <body>
     <div id="container">
-      <section class="border">
-        <h1>~La Plume De Cristal~</h1>
-      </section>
-      <aside id="reframe">
-        <img src="images/Fountain pen.png" width="100%" class="margin" />
-      </aside>
-      <section class="body">
-        <h2>Welcome to the world premier in elegance</h2>
-        <h4>
-          Our pens are only of the finest quality made with premium materials
-          such as leather, stainless steel, silver or gold plating.
-        </h4>
-        <h3>Santos Ballpoint Collection:</h3>
-      </section>
-      <section class="products">
-        <aside class="inline">
-          <img src="images/Cartier Pen (silver).png" width="90%" />
-          <h4>
-            <a
-              href="https://www.cartier.com/en-se/santos-de-cartier-ballpoint-pen_cod2204324140344169.html#dept=EU_Writing-Instruments-Pens"
-              target="_blank"
-            >
-              Santos De Cartier Ball Point Pen (Silver)
-            </a>
-          </h4>
-        </aside>
-        <aside class="inline">
-          <img src="images/Cartier Pen (turquoise).png" width="90%" />
-          <h4>
-            <a
-              href="https://www.cartier.sg/en-sg/collections/accessories/accessories/writing-instruments/santos-de-cartier/op000182-santos-de-cartier-pen.html?gclid=Cj0KCQiA4uCcBhDdARIsAH5jyUlSFCrF86-jnZbPQ64CXTJbZQgAF7otmoDykSrX1cNKOnbcxicyWgoaArODEALw_wcB&gclsrc=aw.ds"
-              target="_blank"
-            >
-              Santos De Cartier Ball Point Pen (Turquoise)
-            </a>
-          </h4>
-        </aside>
-        <aside class="inline">
-          <img src="images/Cartier Pen (Black).png" width="90%" />
-          <h4>
-            <a
-              href="https://www.cartier.com/en-gb/santos-de-cartier-pen_cod25372685655528409.html"
-              target="_blank"
-            >
-              Santos De Cartier Ball Point Pen (Black)
-            </a>
-          </h4>
-        </aside>
-      </section>
-      <section class="paragraph">
-        <h5>Our collection</h5>
-        <p>
-          Our collection is comprised of only the finest quality pens from
-          around the world with quality brands such as
-          <a href="https://www.Cartier.sg" target="_blank"> Cartier</a>,
-          <a
-            href="https://www.harrods.com/en-sg/shopping/home-furniture-luxury-stationery-pens-pencils"
-            target="_blank"
-          >
-            Harrods</a
-          >
-          and more. Do check out our in house shops located around places in
-          Asia such as India, China, The Philippines, Japan as well as
-          Singapore. There, you will be able to try out the silky smooth scrawl
-          unique to every one of our pens.
-        </p>
-      </section>
-      <section class="footer">
-        <h2>All credits to Cartier 2022 ©</h2>
-      </section>
+      <button id="resizeButton">Resize Grid</button>
+      <div id="grid"></div>
+      <div id="controls">
+        <input type="color" id="colorPicker" value="#000000" />
+        <button id="clearButton">Clear</button>
+        <button id="eraserButton">Eraser</button>
+      </div>
     </div>
+    <script>
+      function createGrid(x, y) {
+        const container = document.getElementById("grid");
+        container.innerHTML = ""; // Clear existing grid
+        container.style.gridTemplateColumns = `repeat(${x}, 20px)`; // Specify the number of columns
+
+        for (let i = 0; i < x * y; i++) {
+          const pixel = document.createElement("div");
+          pixel.classList.add("pixel");
+          container.appendChild(pixel);
+
+          // Add event listeners for new pixels
+          pixel.addEventListener("mouseenter", () => {
+            if (isDrawing) {
+              if (isErasing) {
+                pixel.style.backgroundColor = "white"; // Erase pixel
+              } else {
+                pixel.style.backgroundColor = currentColor; // Draw with selected color
+              }
+            }
+          });
+
+          pixel.addEventListener("mousedown", () => {
+            isDrawing = true;
+            if (isErasing) {
+              pixel.style.backgroundColor = "white"; // Erase pixel
+            } else {
+              pixel.style.backgroundColor = currentColor; // Draw with selected color
+            }
+          });
+        }
+      }
+
+      const resizeButton = document.getElementById("resizeButton");
+      const clearButton = document.getElementById("clearButton");
+      const eraserButton = document.getElementById("eraserButton");
+      const colorPicker = document.getElementById("colorPicker");
+      let currentColor = colorPicker.value;
+      let isErasing = false;
+
+      colorPicker.addEventListener("input", () => {
+        currentColor = colorPicker.value;
+        isErasing = false; // Switch back to drawing mode when color is selected
+      });
+
+      eraserButton.addEventListener("click", () => {
+        isErasing = true;
+      });
+
+      resizeButton.addEventListener("click", () => {
+        const newX = prompt("Enter the number of columns (X):");
+        const newY = prompt("Enter the number of rows (Y):");
+
+        if (
+          newX &&
+          newY &&
+          !isNaN(newX) &&
+          !isNaN(newY) &&
+          newX > 0 &&
+          newY > 0
+        ) {
+          createGrid(newX, newY);
+        } else {
+          alert(
+            "Invalid grid size. Please enter positive numbers for both X and Y."
+          );
+        }
+      });
+
+      // Prompt for initial grid size when the app is launched
+      const initialX = prompt("Enter the number of columns (X):");
+      const initialY = prompt("Enter the number of rows (Y):");
+
+      if (
+        initialX &&
+        initialY &&
+        !isNaN(initialX) &&
+        !isNaN(initialY) &&
+        initialX > 0 &&
+        initialY > 0
+      ) {
+        createGrid(initialX, initialY);
+      } else {
+        alert(
+          "Invalid grid size. Please enter positive numbers for both X and Y."
+        );
+      }
+
+      // Add mousePressed function
+      let isDrawing = false;
+      const container = document.getElementById("grid");
+
+      container.addEventListener("mousedown", () => {
+        isDrawing = true;
+      });
+
+      container.addEventListener("mouseup", () => {
+        isDrawing = false;
+      });
+
+      container.addEventListener("mouseleave", () => {
+        isDrawing = false;
+      });
+
+      clearButton.addEventListener("click", () => {
+        const pixels = document.querySelectorAll(".pixel");
+        pixels.forEach((pixel) => {
+          pixel.style.backgroundColor = "white";
+        });
+      });
+    </script>
   </body>
 </html>
